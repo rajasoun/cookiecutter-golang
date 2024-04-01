@@ -1,0 +1,48 @@
+--- 
+linters:
+  enable:
+    - gocyclo
+    - dupl
+    - govet
+    - gosimple
+    - staticcheck
+    - unconvert
+    - unused
+    - structcheck
+    - stylecheck
+    - unused
+    - coverage 
+    - paniccheck
+  disable:
+    - lll
+  gocyclo:
+    min-complexity: 10
+  dupl:
+    threshold: 100
+  govet:
+    vettool: govet
+  staticcheck:
+    checks:
+      - SA1019
+  unconvert:
+    ignore:
+      - "time.Time -> string"
+  unused:
+    check-exported: true
+  structcheck:
+    unused-fields: true
+  stylecheck:
+    enable:
+      - all
+    ignore:
+      - SA4006 # variable names like x  i
+  unused:
+    check-exported: false
+    check-tests: false
+  gosimple:
+    min-confidence: 0.8
+  coverage:
+    enable: true
+    min-coverage: 70.0
+    exclude: []
+

@@ -1,0 +1,19 @@
+{
+    "gopls": {
+        "usePlaceholders": true,
+        "completeUnimported": true,
+        "deepCompletion": true,
+        "staticcheck": true,
+        "matcher": "fuzzy",
+        "linkTarget": "pkg.go.dev",
+        "hoverKind": "SynopsisDocumentation",
+        "completionDocumentation": true,
+        "watchFileChanges": true,
+        "env": {
+            "GOFLAGS": "-tags=dev"
+        },
+        "buildFlags": [
+            "-tags=integration"
+        ]
+    }
+}

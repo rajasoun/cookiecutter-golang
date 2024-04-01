@@ -1,0 +1,85 @@
+version: '3'
+
+vars:
+  APP: '{{cookiecutter.app_name}}'
+  VERSION: '{{cookiecutter.app_version}}'
+  REPORTS_DIR: '.reports'
+
+tasks:
+  # Default task
+  default:
+    desc: 'Run default task'
+    deps:
+      - help
+
+  # This help
+  help:
+    desc: 'Display this help message'
+    cmds:
+      - task --list
+
+  # Test Go
+  test:
+    desc: 'Test Go code'
+    cmds:
+      - mkdir -p .reports
+      - gotestsum -- -coverprofile=.reports/outfile -tags=integration ./...
+
+  # Go Lint
+  lint:
+    desc: 'Lint Go code'
+    cmds:
+      - golangci-lint run ./...
+
+  # Watch for changes and run tests
+  tdd:
+    desc: 'Watch for changes and run tests'
+    cmds:
+      - 'gotestsum --watch -- -count=1 -tags=integration ./...'
+
+  # View test coverage
+  coverage:
+    desc: 'View test coverage'
+    cmds:
+      - mkdir -p .reports
+      - sh run-unit-tests.sh
+
+  # Run gosec 
+  gosec:
+    desc: 'Run gosec'
+    cmds:
+      - gosec ./...
+
+  # Build Go with version
+  build:
+    desc: 'Build Go application with version information'
+    cmds:
+      - echo "Building {{'{{'}}.APP{{'}}'}}-{{'{{'}}.VERSION{{'}}'}}"
+      - echo "Build date {{'{{'}}.BUILD_DATE{{'}}'}}"
+      - echo "Git version {{'{{'}}.GIT_VERSION{{'}}'}}"
+      - mkdir -p bin
+      - |
+        go build -o bin/{{'{{'}}.APP{{'}}'}}-{{'{{'}}.VERSION{{'}}'}} -ldflags "\
+          -X github.com/{{cookiecutter.github_username}}/{{cookiecutter.app_name}}/internal/version.AppName={{'{{'}}.APP{{'}}'}} \
+          -X github.com/{{cookiecutter.github_username}}/{{cookiecutter.app_name}}/version.Version={{'{{'}}.VERSION{{'}}'}} \
+          -X github.com/{{cookiecutter.github_username}}/{{cookiecutter.app_name}}/internal/version.BuildDate={{'{{'}}.BUILD_DATE{{'}}'}} \
+          -X github.com/{{cookiecutter.github_username}}/{{cookiecutter.app_name}}/internal/version.GitCommit={{'{{'}}.GIT_VERSION{{'}}'}}" main.go
+    vars:
+      BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+      GIT_VERSION: $(git rev-parse HEAD)
+
+  # Run Go
+  run:
+    desc: 'Run Go application'
+    cmds:
+      - go run main.go
+
+  # Install go packages
+  install-tools:
+    desc: 'Install go tools'
+    cmds:
+      - go install -v golang.org/x/tools/gopls@latest
+      - go install -v gotest.tools/gotestsum@latest
+      - go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - go install -v github.com/securego/gosec/v2/cmd/gosec@latest
+

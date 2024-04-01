@@ -1,0 +1,8 @@
+{
+    "app_name": "golang-rest-app",
+    "project_short_description": "REST API bootstrap",
+    "project_long_description": "REST API bootstrap with Golang",
+    "full_name": "Raja Soundaramourty",
+    "github_username": "rajasoun",
+    "app_version" : "1.0.0"
+}
