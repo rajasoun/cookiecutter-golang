@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: adminer-ingress
+  namespace: database
+  annotations:
+    networking.kubernetes.io/ingress.class: nginx
+  labels:
+      app: adminer
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: adminer.local.gd
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: adminer
+            port:
+              number: 80
+---

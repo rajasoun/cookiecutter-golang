@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+
+  # Receives the Trace Events from the instrumented application 
+  # Exports the Trace Events to the adot-collector Collector and 
+  # Exports the Trace Events to the Jaeger Viewer
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    ports:
+      - "4317:4317" # otel-collector gRPC endpoint
+    volumes:
+      - ${PWD}/.local/docker/otel-jaeger-config.yaml:/etc/otel-collector-config.yaml
+    command: ["--config=/etc/otel-collector-config.yaml"]
+
+  # Receiver the Trace Events from the otel-collector 
+  # Exports the Trace Events to the AWS X-Ray Service
+  adot-collector:
+    image: public.ecr.aws/aws-observability/aws-otel-collector:latest
+    container_name: adot-collector
+    ports:
+      - "14317:4317" # adot-collector  gRPC endpoint
+      - "55680:55680"
+      - "8889:8888"
+    environment:
+      - AWS_REGION=us-west-2
+      - AWS_PROFILE=lcp-sandbox
+    volumes:
+      - ~/.aws:/root/.aws
+      - ${PWD}/.local/docker/adot-xray-config.yaml:/otel-local-config.yaml
+    command: --config otel-local-config.yaml
+
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-all-in-one
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14250:14250" # Jaeger Thrift HTTP
+      - "14268:14268" # Jaeger Thrift compact protocol

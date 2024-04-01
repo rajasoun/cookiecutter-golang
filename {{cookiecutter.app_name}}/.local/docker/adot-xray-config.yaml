@@ -1,0 +1,35 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "adot-collector:55681" # Use the service name of the ADOT collector defined in the Docker Compose file.
+
+processors:
+  batch:
+
+exporters:
+  logging:
+    verbosity: detailed
+  awsxray:
+    region: 'us-west-2'
+  awsemf:
+    region: 'us-west-2'
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [awsxray] # Export to AWS X-Ray
+    metrics:
+      receivers: [otlp]
+      exporters: [awsemf]
+
+  extensions: [pprof]
+  telemetry:
+    logs:
+      level: debug
